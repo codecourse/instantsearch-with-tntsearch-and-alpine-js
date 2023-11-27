@@ -1,0 +1,30 @@
+{% extends 'app.twig' %}
+
+{% block content %}
+    <div x-data="searchScope()" x-init="search" class="search">
+        <input type="text" x-model="q" x-on:keyup.debounce.200="search">
+
+        <template x-for="result in results" x-key="result.id">
+            <div>
+                <h3 x-text="result.title"></h3>
+            </div>
+        </template>
+    </div>
+
+    <script>
+        function searchScope() {
+            return {
+                q: new URLSearchParams(window.location.search).get('q') || '',
+                results: [],
+
+                search () {
+                    fetch(`/api/courses?q=${this.q}`)
+                        .then(response => response.json())
+                        .then(response => {
+                            this.results = response
+                        })
+                }
+            }
+        }
+    </script>
+{% endblock %}
